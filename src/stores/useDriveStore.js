@@ -23,6 +23,7 @@ export const useDriveStore = create((set, get) => ({
     accelerationZ: data.accelerationZ,
   }),
   startDrive: async () => {
+    set({ driveId: null, driveInterval: null, driveHistory: [] });
     const response = await reqPostDriveStart();
     set({
       driveId: response.id,
@@ -49,6 +50,10 @@ export const useDriveStore = create((set, get) => ({
   },
   stopDrive: async () => {
     if (!get().driveId) return;
+
+    const driveInterval = get().driveInterval;
+    clearInterval(driveInterval);
+
     try {
       const driveId = get().driveId;
       const driveHistory = get().driveHistory;
@@ -57,9 +62,7 @@ export const useDriveStore = create((set, get) => ({
     } catch (error) {
       console.error(error);
     } finally {
-      const driveInterval = get().driveInterval;
-      clearInterval(driveInterval);
-      set({ driveId: null, driveInterval: null, driveHistory: [] });
+      set({ driveId: null, driveInterval: null });
     }
   },
 }));
