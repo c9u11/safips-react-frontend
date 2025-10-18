@@ -1,6 +1,10 @@
 import axios from "axios";
 
-export const apiClient = axios.create();
+export const apiClient = axios.create({
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false
+  })
+});
 
 export function ApiClientSetting() {
   apiClient.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
