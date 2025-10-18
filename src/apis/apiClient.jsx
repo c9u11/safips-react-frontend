@@ -7,6 +7,7 @@ export function ApiClientSetting() {
   apiClient.defaults.headers.common["Content-Type"] = "application/json";
 
   apiClient.interceptors.request.use((config) => {
+    config.headers.Authorization = import.meta.env.VITE_API_TOKEN;
     return config;
   });
 
