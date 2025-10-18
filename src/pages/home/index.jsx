@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export default function Home() {
   const [deviceMotion, setDeviceMotion] = useState(null);
   const [deviceOrientation, setDeviceOrientation] = useState(null);
+
   useEffect(() => {
     const handleDeviceMotion = (event) => {
       console.log(event);
@@ -25,8 +26,9 @@ export default function Home() {
         screenY: event.screenY,
       });
     };
-    window.addEventListener('devicemotion', handleDeviceMotion);
-    window.addEventListener('deviceorientation', handleDeviceOrientation);
+    window.addEventListener('devicemotion', handleDeviceMotion, true);
+    window.addEventListener('deviceorientation', handleDeviceOrientation, true);
+    alert('added event listeners');
     return () => {
       window.removeEventListener('devicemotion', handleDeviceMotion);
       window.removeEventListener('deviceorientation', handleDeviceOrientation);
