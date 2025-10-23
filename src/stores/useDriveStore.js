@@ -1,55 +1,77 @@
 import { create } from 'zustand';
 import { reqPostDriveStart, reqPostDriveStop, reqPostDriveSensor } from '@/apis/drive';
+import { requestSensorPermissions, addSensorListeners, removeSensorListeners } from '@/utils/sensor';
 
 export const useDriveStore = create((set, get) => ({
   driveId: null,
+  driveStatus: 'idle',
+  driveStartTime: null,
   accelerationX: 0,
   accelerationY: 0,
   accelerationZ: 0,
+  accelerationTimestamp: null,
   gyroscopeX: 0,
   gyroscopeY: 0,
   gyroscopeZ: 0,
+  gyroscopeTimestamp: null,
   driveHistory: [],
   driveInterval: null,
 
-  setGyroscopeData: (data) => set({
-    gyroscopeX: data.gyroscopeX,
-    gyroscopeY: data.gyroscopeY,
-    gyroscopeZ: data.gyroscopeZ,
-  }),
-  setAccelerationData: (data) => set({
-    accelerationX: data.accelerationX,
-    accelerationY: data.accelerationY,
-    accelerationZ: data.accelerationZ,
-  }),
+  motionHandler: (event) => {
+    set({
+      accelerationX: event.acceleration.x,
+      accelerationY: event.acceleration.y,
+      accelerationZ: event.acceleration.z,
+      accelerationTimestamp: new Date().toISOString(),
+    });
+  },
+  orientationHandler: (event) => {
+    set({
+      gyroscopeX: event.alpha,
+      gyroscopeY: event.beta,
+      gyroscopeZ: event.gamma,
+      gyroscopeTimestamp: new Date().toISOString(),
+    });
+  },
+  addSensorDataToDriveHistory: async () => {
+    if (("geolocation" in navigator)) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const sensorData = {
+          gyroscopeX: get().gyroscopeX,
+          gyroscopeY: get().gyroscopeY,
+          gyroscopeZ: get().gyroscopeZ,
+          gyroscopeTimestamp: get().gyroscopeTimestamp,
+          accelerationX: get().accelerationX,
+          accelerationY: get().accelerationY,
+          accelerationZ: get().accelerationZ,
+          accelerationTimestamp: get().accelerationTimestamp,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          timestamp: new Date().toISOString(),
+        };
+        set({ driveHistory: [...get().driveHistory, sensorData] });
+      });
+    }
+  },
   startDrive: async () => {
-    set({ driveId: null, driveInterval: null, driveHistory: [] });
+    const permissions = await requestSensorPermissions();
+    const allGranted = Object.values(permissions).every(permission => permission === 'granted' || permission === 'not-supported');
+    if (!allGranted) return new Error('권한이 거절되었습니다.');
+
+    set({ driveId: null, driveInterval: null, driveHistory: [], driveStatus: 'recording', driveStartTime: new Date().toISOString() });
+
+    addSensorListeners(get().motionHandler, get().orientationHandler);
+
     const response = await reqPostDriveStart();
+    if (isNaN(response.id)) return new Error('시작에 실패했습니다.');
     set({
       driveId: response.id,
-      driveInterval: setInterval(async () => {
-        if (("geolocation" in navigator)) {
-          navigator.geolocation.getCurrentPosition(async (position) => {
-            const sensorData = {
-              gyroscopeX: get().gyroscopeX,
-              gyroscopeY: get().gyroscopeY,
-              gyroscopeZ: get().gyroscopeZ,
-              accelerationX: get().accelerationX,
-              accelerationY: get().accelerationY,
-              accelerationZ: get().accelerationZ,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              timestamp: new Date().toISOString(),
-            };
-            set({ driveHistory: [...get().driveHistory, sensorData] });
-          });
-        }
-      }, 100),
+      driveInterval: setInterval(get().addSensorDataToDriveHistory, 100),
     });
 
   },
   stopDrive: async () => {
-    if (!get().driveId) return;
+    if (get().driveStatus !== 'recording') return;
 
     const driveInterval = get().driveInterval;
     clearInterval(driveInterval);
@@ -62,7 +84,7 @@ export const useDriveStore = create((set, get) => ({
     } catch (error) {
       console.error(error);
     } finally {
-      set({ driveId: null, driveInterval: null });
+      set({ driveId: null, driveInterval: null, driveStatus: 'idle', driveStartTime: null });
     }
   },
 }));
