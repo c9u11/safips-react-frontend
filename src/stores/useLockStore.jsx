@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { wakeLockScreen } from '@/utils/screen';
+import { wakeLockScreen, releaseWakeLockScreen } from '@/utils/screen';
 
 export const useLockStore = create((set, get) => ({
   isLocked: false,
