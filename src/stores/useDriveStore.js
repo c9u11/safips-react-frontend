@@ -54,8 +54,12 @@ export const useDriveStore = create((set, get) => ({
         const newHistory = [...currentHistory, sensorData];
 
         if (newHistory.length > 100) {
-          reqPostDriveSensor(driveId, { sensorLocationData: newHistory });
-          set({ driveHistory: [] });
+          try {
+            reqPostDriveSensor(driveId, { sensorLocationData: newHistory });
+            set({ driveHistory: [] });
+          } catch (error) {
+            set({ driveHistory: newHistory });
+          }
         } else {
           set({ driveHistory: newHistory });
         }
