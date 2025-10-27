@@ -12,7 +12,8 @@ export const wakeLockScreen = async () => {
 export const releaseWakeLockScreen = async () => {
   if (!('wakeLock' in navigator)) return false;
   try {
-    await navigator.wakeLock.release()
+    const wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.release();
     return true;
   } catch (error) {
     console.error('Wake lock release failed:', error);
