@@ -49,7 +49,16 @@ export const useDriveStore = create((set, get) => ({
           longitude: position.coords.longitude,
           timestamp: new Date().toISOString(),
         };
-        set({ driveHistory: [...get().driveHistory, sensorData] });
+        const driveId = get().driveId;
+        const currentHistory = get().driveHistory;
+        const newHistory = [...currentHistory, sensorData];
+
+        if (newHistory.length > 100) {
+          reqPostDriveSensor(driveId, { sensorLocationData: newHistory });
+          set({ driveHistory: [] });
+        } else {
+          set({ driveHistory: newHistory });
+        }
       });
     }
   },
