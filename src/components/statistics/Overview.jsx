@@ -2,6 +2,7 @@ import Drawer from "./Drawer";
 import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Item from "./Item";
+import ShakeGraph from "./ShakeGraph";
 
 export default function Overview() {
   const navigate = useNavigate();
@@ -24,8 +25,8 @@ export default function Overview() {
         drawerContent={
           <div className="w-full gap-4 flex items-center">
             <Item title="흔들림" value="2회" />
-            <div className="flex-1 aspect-2/1 bg-[#555555]/50 rounded-lg">
-              Graph
+            <div className="flex-1 aspect-2/1 overflow-hidden">
+              <ShakeGraph />
             </div>
           </div>
         }
