@@ -3,6 +3,8 @@ import { ROUTES_PATH_STATISTICS_OVERVIEW } from "@/constants/routes";
 import Card from "./Card";
 import Badge from "./Badge";
 import HistoryData from "./HistoryData";
+import CustomMap from "../map/CustomMap";
+import { POSITIONS_EXAMPLE } from "@/examples/map";
 
 export default function OverviewSummary() {
   return (
@@ -22,7 +24,9 @@ export default function OverviewSummary() {
           calories="170"
         />
         <div className="w-full h-[1px] bg-[#555555]/50 my-1" />
-        <div className="w-full aspect-2/1 bg-[#555555]/50 rounded-lg"></div>
+        <div className="w-full aspect-2/1 bg-[#555555]/50 rounded-lg">
+          <CustomMap positions={POSITIONS_EXAMPLE} currentPositionEnabled={false} />
+        </div>
       </Card>
       <Card>
         <span className="text-sm">획득 뱃지</span>
