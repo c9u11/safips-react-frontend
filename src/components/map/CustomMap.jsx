@@ -95,7 +95,7 @@ export default function CustomMap({ positions, points, currentPositionEnabled = 
       center={[37.5145, 126.9076]}
       zoom={13}
       style={{ height: "100%", width: "100%", zIndex: 0 }}
-      zoomControl={true}
+      zoomControl={false}
       scrollWheelZoom={true}
       maxBounds={koreaBounds}
       maxBoundsViscosity={1.0}
@@ -146,6 +146,7 @@ export default function CustomMap({ positions, points, currentPositionEnabled = 
           <Marker
             position={[currentPosition.latitude, currentPosition.longitude]}
             icon={CurrentLocationIcon()}
+            zIndexOffset={1000}
           >
             <Popup>
               <div>
