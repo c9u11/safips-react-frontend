@@ -3,11 +3,17 @@ import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Item from "./Item";
 import ShakeGraph from "./ShakeGraph";
+import CustomMap from "../map/CustomMap";
+import { POSITIONS_EXAMPLE } from "@/examples/map";
 
 export default function Overview() {
   const navigate = useNavigate();
+
   return (
     <div className="w-full flex-1 flex flex-col bg-[#ddd]">
+      <div className="w-full flex-1 relative">
+        <CustomMap positions={POSITIONS_EXAMPLE} currentPositionEnabled={false} />
+      </div>
       <button
         className="absolute top-8 left-8 bg-[#272727] rounded-lg p-2 shadow-md"
         onClick={() => navigate(-1)}

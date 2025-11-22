@@ -4,10 +4,12 @@ import {
   ROUTES_BASENAME,
   ROUTES_PATH_ROOT,
   ROUTES_PATH_HOME,
-  ROUTES_PATH_STATISTICS
+  ROUTES_PATH_STATISTICS,
+  ROUTES_PATH_MAP
 } from "@/constants/routes";
 import Home from "@/pages/home";
 import Statistics from "@/pages/statistics";
+import Map from "@/pages/map";
 
 // 로딩 컴포넌트
 const LoadingSpinner = () => (
@@ -47,6 +49,10 @@ export default function () {
                 <Route
                   path={`${ROUTES_PATH_STATISTICS}/*`}
                   element={<Statistics />}
+                />
+                <Route
+                  path={ROUTES_PATH_MAP}
+                  element={<Map />}
                 />
                 <Route path={ROUTES_PATH_ROOT} element={<RootNavigator />} />
                 <Route path="*" element={<RootNavigator />} />
