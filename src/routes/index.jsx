@@ -9,7 +9,7 @@ import {
 } from "@/constants/routes";
 import Home from "@/pages/home";
 import Statistics from "@/pages/statistics";
-import Map from "@/pages/Map";
+import Map from "@/pages/map";
 
 // 로딩 컴포넌트
 const LoadingSpinner = () => (
