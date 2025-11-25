@@ -13,7 +13,14 @@ export default function HistoryDetail() {
   const { id } = useParams();
   const getHistoryDataById = useHistoryStore((state) => state.getHistoryDataById);
   const historyData = useHistoryStore((state) => state.historyData);
-  const { startDateTime, distance, eventCount, endDateTime, totalCalories, route } = historyData[id];
+  const { startDateTime, distance, eventCount, endDateTime, totalCalories, route } = historyData?.[id] || {
+    startDateTime: null,
+    distance: 0,
+    eventCount: 0,
+    endDateTime: null,
+    totalCalories: 0,
+    route: null
+  };
   const [points, setPoints] = useState([]);
   const [positions, setPositions] = useState([]);
   const [impactValues, setImpactValues] = useState([]);
@@ -46,8 +53,8 @@ export default function HistoryDetail() {
         visibleContent={
           <div className="flex justify-between">
             <Item title="총 시간" value={getSecondsBetweenDates(startDateTime, endDateTime)} />
-            <Item title="총 거리" value={`${distance} km`} />
-            <Item title="총 칼로리" value={`${totalCalories} kcal`} />
+            <Item title="총 거리" value={`${distance?.toFixed(2)} km`} />
+            <Item title="총 칼로리" value={`${totalCalories?.toFixed(1)} kcal`} />
           </div>
         }
         drawerContent={
