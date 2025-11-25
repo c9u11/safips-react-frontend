@@ -7,19 +7,21 @@ import CustomMap from "../map/CustomMap";
 import useHistoryStore from "@/stores/useHistoryStore";
 import { useEffect, useState } from "react";
 import { getSecondsBetweenDates } from "@/utils/date";
-import { getDrivePositionsAndImpactValues } from "@/utils/drive";
+import { getDriveDetailData } from "@/utils/drive";
 export default function HistoryDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
   const getHistoryDataById = useHistoryStore((state) => state.getHistoryDataById);
   const historyData = useHistoryStore((state) => state.historyData);
   const { startDateTime, distance, eventCount, endDateTime, totalCalories, route } = historyData[id];
+  const [points, setPoints] = useState([]);
   const [positions, setPositions] = useState([]);
   const [impactValues, setImpactValues] = useState([]);
 
   useEffect(() => {
     if (route) {
-      const { positions, impactValues } = getDrivePositionsAndImpactValues(route);
+      const { positions, impactValues, impactPoints } = getDriveDetailData(route);
+      setPoints(impactPoints);
       setPositions(positions);
       setImpactValues(impactValues);
     }
@@ -32,7 +34,7 @@ export default function HistoryDetail() {
   return (
     <div className="w-full flex-1 flex flex-col bg-[#ddd]">
       <div className="w-full flex-1 relative">
-        <CustomMap positions={positions} currentPositionEnabled={false} />
+        <CustomMap points={points} positions={positions} currentPositionEnabled={false} />
       </div>
       <button
         className="absolute top-8 left-8 bg-[#272727] rounded-lg p-2 shadow-md"

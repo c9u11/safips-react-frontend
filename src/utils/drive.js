@@ -53,8 +53,9 @@ const lttb = (data, threshold) => {
   return sampled;
 };
 
-export const getDrivePositionsAndImpactValues = (route, threshold = 100) => {
+export const getDriveDetailData = (route, threshold = 100) => {
   const { nodes } = route;
+  const impactPoints = [];
   const positions = [];
   const allImpactValues = [];
 
@@ -65,10 +66,16 @@ export const getDrivePositionsAndImpactValues = (route, threshold = 100) => {
       x: new Date(node.timestamp).getTime(),
       y: node.impactValue
     });
+    if (node.events && node.events.length > 0) {
+      impactPoints.push({
+        latitude: node.latitude,
+        longitude: node.longitude
+      });
+    }
   });
 
   // LTTB 알고리즘 적용하여 다운샘플링
   const impactValues = lttb(allImpactValues, threshold);
 
-  return { positions, impactValues };
+  return { positions, impactValues, impactPoints };
 }

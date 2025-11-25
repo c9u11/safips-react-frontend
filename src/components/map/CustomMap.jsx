@@ -130,13 +130,13 @@ export default function CustomMap({ positions, points, currentPositionEnabled = 
           position={[point.latitude, point.longitude]}
           icon={WarningIcon()}
         >
-          <Popup>
+          {/* <Popup>
             <div>
               <strong>충격 주의</strong>
               <br />
               가속도: {point.magnitude.toFixed(2)} m/s²
             </div>
-          </Popup>
+          </Popup> */}
         </Marker>
       ))}
 
