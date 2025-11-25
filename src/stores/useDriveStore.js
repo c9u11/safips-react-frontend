@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { reqPostDriveStart, reqPostDriveStop, reqPostDriveSensor } from '@/apis/drive';
 import { requestSensorPermissions, addSensorListeners, removeSensorListeners } from '@/utils/sensor';
+import { calculateDistance, calculateSpeed, calculateCalories } from '@/utils/calculate';
 
 export const useDriveStore = create((set, get) => ({
   driveId: null,
@@ -16,6 +17,9 @@ export const useDriveStore = create((set, get) => ({
   gyroscopeTimestamp: null,
   driveHistory: [],
   driveInterval: null,
+  distance: 0.00,
+  currentSpeed: 0.00,
+  totalCalories: 0.0,
 
   motionHandler: (event) => {
     set({
@@ -36,6 +40,7 @@ export const useDriveStore = create((set, get) => ({
   addSensorDataToDriveHistory: async () => {
     if (("geolocation" in navigator)) {
       navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
         const sensorData = {
           gyroscopeX: get().gyroscopeX,
           gyroscopeY: get().gyroscopeY,
@@ -45,13 +50,20 @@ export const useDriveStore = create((set, get) => ({
           accelerationY: get().accelerationY,
           accelerationZ: get().accelerationZ,
           accelerationTimestamp: get().accelerationTimestamp,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: latitude,
+          longitude: longitude,
           timestamp: new Date().toISOString(),
         };
         const driveId = get().driveId;
         const currentHistory = get().driveHistory;
         const newHistory = [...currentHistory, sensorData];
+
+        const lastLocation = newHistory.length > 0 ? newHistory[newHistory.length - 1] : null;
+        const previousDistance = get().distance;
+        const distance = lastLocation ? calculateDistance(lastLocation.latitude, lastLocation.longitude, latitude, longitude) : 0;
+        const currentSpeed = calculateSpeed(distance, new Date().getTime() - new Date(lastLocation.timestamp).getTime());
+        const totalCalories = calculateCalories(previousDistance + distance);
+        set({ distance: previousDistance + distance, currentSpeed: currentSpeed, totalCalories: totalCalories });
 
         if (newHistory.length > 100) {
           try {
