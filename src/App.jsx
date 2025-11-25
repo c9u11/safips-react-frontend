@@ -1,6 +1,12 @@
 import Routes from '@/routes';
+import PWAUpdatePrompt from '@/components/PWAUpdatePrompt';
 
 const App = () => {
-  return <Routes />;
+  return (
+    <>
+      <Routes />
+      <PWAUpdatePrompt />
+    </>
+  );
 };
 export default App;
