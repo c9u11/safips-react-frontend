@@ -69,6 +69,7 @@ export default function History() {
               {items.map((item) => (
                 <HistoryDataCard
                   key={item.id}
+                  id={item.id}
                   title={formatDateToKorean(item.startDateTime)}
                   distance={item.distance}
                   count={item.eventCount}

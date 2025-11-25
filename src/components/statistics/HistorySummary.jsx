@@ -26,6 +26,7 @@ export default function HistorySummary() {
           return (
             <HistoryDataCard
               key={historyId}
+              id={historyId}
               title={formatDateToKorean(startDateTime)}
               distance={distance}
               count={eventCount}
