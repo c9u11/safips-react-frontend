@@ -13,7 +13,7 @@ export default function HistoryDetail() {
   const { id } = useParams();
   const getHistoryDataById = useHistoryStore((state) => state.getHistoryDataById);
   const historyData = useHistoryStore((state) => state.historyData);
-  const { startDateTime, distance, eventCount, endDateTime, totalCalories, route } = historyData;
+  const { startDateTime, distance, eventCount, endDateTime, totalCalories, route } = historyData[id];
   const [positions, setPositions] = useState([]);
   const [impactValues, setImpactValues] = useState([]);
 

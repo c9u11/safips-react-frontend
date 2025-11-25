@@ -45,7 +45,7 @@ export const useHistoryStore = create((set, get) => ({
   },
   getHistoryDataById: async (id) => {
     const response = await reqGetDrive(id);
-    set({ historyData: response });
+    set({ historyData: { ...get().historyData, [id]: response } });
   },
 }));
 
