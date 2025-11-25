@@ -79,6 +79,8 @@ export const useDriveStore = create((set, get) => ({
     }
   },
   startDrive: async () => {
+    if (get().driveStatus !== 'idle') return;
+
     const permissions = await requestSensorPermissions();
     const allGranted = Object.values(permissions).every(permission => permission === 'granted' || permission === 'not-supported');
     if (!allGranted) return new Error('권한이 거절되었습니다.');
