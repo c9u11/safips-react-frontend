@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 
-export default function ShakeGraph() {
+export default function ShakeGraph({ data }) {
   const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 200, height: 100 });
 
@@ -28,33 +28,43 @@ export default function ShakeGraph() {
 
   const { width, height } = dimensions;
 
-  // 임의의 흔들림 데이터 생성 (시간에 따른 흔들린 정도)
-  const data = useMemo(() => {
-    const points = 20;
-    const maxShake = 100;
-    return Array.from({ length: points }, (_, i) => {
-      const x = (i / (points - 1)) * width;
-      // 자연스러운 흔들림 패턴을 위한 사인파 + 랜덤 노이즈
-      const base = Math.sin((i / points) * Math.PI * 4) * 30 + 50;
-      const noise = (Math.random() - 0.5) * 20;
-      const y = height - ((base + noise) / maxShake) * height;
-      return { x, y };
-    });
-  }, [width, height]);
+  // 데이터를 SVG 좌표계로 정규화
+  const normalizedData = useMemo(() => {
+    if (!data || data.length < 2) return [];
+
+    // x, y의 최소/최대값 계산
+    const xValues = data.map(d => d.x);
+    const yValues = data.map(d => d.y);
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    const minY = Math.min(...yValues);
+    const maxY = Math.max(...yValues);
+
+    // 범위 계산 (0으로 나누기 방지)
+    const xRange = maxX - minX || 1;
+    const yRange = maxY - minY || 1;
+
+    // SVG 좌표계로 정규화
+    // x: 0 ~ width, y: height ~ 0 (SVG는 위에서 아래로 증가하므로 뒤집음)
+    return data.map(point => ({
+      x: ((point.x - minX) / xRange) * width,
+      y: height - ((point.y - minY) / yRange) * height
+    }));
+  }, [data, width, height]);
 
   // 부드러운 곡선을 위한 베지어 곡선 path 생성
   const pathData = useMemo(() => {
-    if (data.length < 2) return "";
+    if (!normalizedData || normalizedData.length < 2) return "";
 
-    const first = data[0];
+    const first = normalizedData[0];
     let path = `M ${first.x} ${first.y}`;
 
     // Catmull-Rom 스플라인을 베지어 곡선으로 변환
-    for (let i = 0; i < data.length - 1; i++) {
-      const p0 = i > 0 ? data[i - 1] : data[i];
-      const p1 = data[i];
-      const p2 = data[i + 1];
-      const p3 = i < data.length - 2 ? data[i + 2] : data[i + 1];
+    for (let i = 0; i < normalizedData.length - 1; i++) {
+      const p0 = i > 0 ? normalizedData[i - 1] : normalizedData[i];
+      const p1 = normalizedData[i];
+      const p2 = normalizedData[i + 1];
+      const p3 = i < normalizedData.length - 2 ? normalizedData[i + 2] : normalizedData[i + 1];
 
       // Catmull-Rom 스플라인의 제어점 계산
       const tension = 0.5;
@@ -67,19 +77,19 @@ export default function ShakeGraph() {
     }
 
     return path;
-  }, [data]);
+  }, [normalizedData]);
 
   // 그래디언트 영역 path (아래쪽으로 닫힌 영역)
   const areaPath = useMemo(() => {
-    if (data.length === 0) return "";
-    const first = data[0];
-    const last = data[data.length - 1];
+    if (!normalizedData || normalizedData.length === 0) return "";
+    const first = normalizedData[0];
+    const last = normalizedData[normalizedData.length - 1];
     return `${pathData} L ${last.x} ${height} L ${first.x} ${height} Z`;
-  }, [pathData, data, height]);
+  }, [pathData, normalizedData, height]);
 
   // 마커를 표시할 지점 인덱스 (2곳)
   const markerIndices = useMemo(() => {
-    return [5, 10];
+    return [];
   }, []);
 
   return (
@@ -114,16 +124,16 @@ export default function ShakeGraph() {
 
         {/* 마커 지점에 ! 표시 */}
         {markerIndices.map((index) => {
-          if (index >= data.length) return null;
-          const point = data[index];
+          if (!normalizedData || index >= normalizedData.length) return null;
+          const point = normalizedData[index];
           return (
             <g key={index}>
               {/* 원형 배경 */}
-              <circle cx={point.x} cy={10} r="8" fill="#72D9FF" />
+              <circle cx={point.x} cy={point.y} r="8" fill="#72D9FF" />
               {/* ! 텍스트 */}
               <text
                 x={point.x}
-                y={11}
+                y={point.y + 1}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill="#171717"
@@ -135,7 +145,7 @@ export default function ShakeGraph() {
               {/* 세로 점선 */}
               <line
                 x1={point.x}
-                y1={10}
+                y1={point.y}
                 x2={point.x}
                 y2={height}
                 stroke="#72D9FF"
