@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import { useMap, Marker } from "react-leaflet";
+import { useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet.heat";
 import { reqGetGlobalEvent } from "@/apis/drive";
-import WarningIcon from "./WarningIcon";
 
 
 export default function GlobalEventMarkers() {
   const map = useMap();
   const [globalEvents, setGlobalEvents] = useState({});
   const abortControllerRef = useRef(null);
+  const heatLayerRef = useRef(null);
 
   useEffect(() => {
     if (!map) return;
@@ -52,15 +54,50 @@ export default function GlobalEventMarkers() {
       }
     };
   }, [map]);
-  return (
-    <>
-      {Object.values(globalEvents).map((event, idx) => (
-        <Marker
-          key={idx}
-          position={[event.latitude, event.longitude]}
-          icon={WarningIcon()}
-        />
-      ))}
-    </>
-  );
+
+  // 히트맵 레이어 업데이트
+  useEffect(() => {
+    if (!map) return;
+
+    // 기존 히트맵 레이어 제거
+    if (heatLayerRef.current) {
+      map.removeLayer(heatLayerRef.current);
+    }
+
+    // 히트맵 데이터 생성: [lat, lng, intensity] 형식
+    const heatData = Object.values(globalEvents).map((event) => [
+      event.latitude,
+      event.longitude,
+      1.0, // intensity (필요에 따라 조정 가능)
+    ]);
+
+    // 히트맵 데이터가 있을 때만 레이어 생성
+    if (heatData.length > 0) {
+      const heatLayer = L.heatLayer(heatData, {
+        radius: 15,
+        blur: 20,
+        maxZoom: 17,
+        max: 1.0,
+        gradient: {
+          0.4: 'blue',
+          0.6: 'cyan',
+          0.7: 'lime',
+          0.8: 'yellow',
+          1.0: 'red'
+        }
+      });
+      heatLayer.addTo(map);
+      heatLayerRef.current = heatLayer;
+    }
+
+    // 클린업
+    return () => {
+      if (heatLayerRef.current) {
+        map.removeLayer(heatLayerRef.current);
+        heatLayerRef.current = null;
+      }
+    };
+  }, [map, globalEvents]);
+
+  return null;
 }
