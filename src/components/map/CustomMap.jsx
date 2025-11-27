@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Polyline, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, Marker, ScaleControl } from "react-leaflet";
+import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import WarningIcon from "./WarningIcon";
@@ -33,9 +34,15 @@ export default function CustomMap({ positions, points, currentPositionEnabled = 
       maxZoom={18}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='<br/>&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a><br/>&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a><br/>&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> <br/>contributors'
         url={`https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=${import.meta.env.VITE_STADIAMAPS_API_KEY}`}
         maxZoom={19}
+      />
+
+      <ScaleControl
+        position="bottomleft"
+        imperial={false}
+        metric={true}
       />
 
       {positions && positions.length > 0 && (
