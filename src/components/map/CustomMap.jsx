@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import WarningIcon from "./WarningIcon";
 import CurrentLocationIcon from "./CurrentLocationIcon";
+import GlobalEventMarkers from "./GlobalEventMarkers";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -11,6 +12,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
+
 
 function MapBounds({ positions }) {
   const map = useMap();
@@ -41,7 +43,7 @@ function FollowCurrentLocation({ position }) {
   return null;
 }
 
-export default function CustomMap({ positions, points, currentPositionEnabled = true }) {
+export default function CustomMap({ positions, points, currentPositionEnabled = true, showGlobalEvents = false, children, ...props }) {
   // 한국 범위 (최대 경계)
   const koreaBounds = [
     [33.0, 124.5], // 남서쪽
@@ -166,6 +168,9 @@ export default function CustomMap({ positions, points, currentPositionEnabled = 
           </Marker>
         </>
       )}
+
+      {showGlobalEvents && (<GlobalEventMarkers />)}
+      {children}
     </MapContainer>
   );
 }

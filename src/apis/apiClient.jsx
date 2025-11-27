@@ -16,7 +16,7 @@ export function ApiClientSetting() {
       return response;
     },
     (error) => {
-      if (error.message) alert(error.message);
+      if (error.message && error.message !== 'canceled') alert(error.message);
       return Promise.reject(error);
     }
   );
