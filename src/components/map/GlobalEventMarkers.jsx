@@ -68,7 +68,7 @@ export default function GlobalEventMarkers() {
     const heatData = Object.values(globalEvents).map((event) => [
       event.latitude,
       event.longitude,
-      1.0, // intensity (필요에 따라 조정 가능)
+      event.intensity || 1.0, // intensity (필요에 따라 조정 가능)
     ]);
 
     // 히트맵 데이터가 있을 때만 레이어 생성
