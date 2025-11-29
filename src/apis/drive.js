@@ -30,3 +30,13 @@ export const reqGetGlobalEvent = async (params, signal) => {
   const response = await apiClient.get(`/drive/event/global`, { params, signal });
   return response.data;
 };
+
+export const reqGetDriveOverview = async () => {
+  const response = await apiClient.get(`/drive/overview`);
+  return response.data;
+};
+
+export const reqGetDriveBadge = async () => {
+  const response = await apiClient.get(`/drive/badge`);
+  return response.data;
+};

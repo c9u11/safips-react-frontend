@@ -58,11 +58,12 @@ export const useDriveStore = create((set, get) => ({
         const currentHistory = get().driveHistory;
         const newHistory = [...currentHistory, sensorData];
 
-        const lastLocation = newHistory.length > 0 ? newHistory[newHistory.length - 1] : null;
+        const lastLocation = currentHistory.length > 0 ? currentHistory[currentHistory.length - 1] : null;
         const previousDistance = get().distance;
         const distance = lastLocation ? calculateDistance(lastLocation.latitude, lastLocation.longitude, latitude, longitude) : 0;
-        const currentSpeed = calculateSpeed(distance, new Date().getTime() - new Date(lastLocation.timestamp).getTime());
+        const currentSpeed = calculateSpeed(distance, new Date().getTime() - new Date(lastLocation?.timestamp).getTime());
         const totalCalories = calculateCalories(previousDistance + distance);
+        console.log(previousDistance, distance);
         set({ distance: previousDistance + distance, currentSpeed: currentSpeed, totalCalories: totalCalories });
 
         if (newHistory.length > 100) {
