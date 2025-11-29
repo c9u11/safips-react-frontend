@@ -9,6 +9,7 @@ export default function CurrentMarker() {
   // 현재 위치 상태
   const [currentPosition, setCurrentPosition] = useState(null);
   const [locationError, setLocationError] = useState(null);
+  const [once, setOnce] = useState(false);
 
   useEffect(() => {
     // 위치 추적 시작
@@ -48,13 +49,14 @@ export default function CurrentMarker() {
   }, []);
 
   useEffect(() => {
-    if (currentPosition) {
+    if (currentPosition && !once) {
       map.setView([currentPosition.latitude, currentPosition.longitude], map.getZoom(), {
         animate: true,
         duration: 0.5,
       });
+      setOnce(true);
     }
-  }, [map, currentPosition]);
+  }, [map, currentPosition, once]);
 
   return (
     <>
