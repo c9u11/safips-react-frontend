@@ -14,7 +14,7 @@ export default function Status() {
   const elapsed = useTimer();
   return (
     <div className='flex flex-col gap-10'>
-      <MainItem icon={<LuBike className='text-4xl text-[#72D9FF]' />} title={'거리(km)'} value={distance.toFixed(2)} />
+      <MainItem icon={<LuBike className='text-4xl text-[#72D9FF]' />} title={'거리(km)'} value={(distance / 1000).toFixed(3)} />
       <div className='flex w-full justify-center gap-12 px-12'>
         <SubItem icon={<MdOutlineSpeed className='text-xl' />} title={'현재 속도'} value={currentSpeed.toFixed(2)} />
         <SubItem icon={<RiTimerLine className='text-xl' />} title={'시간'} value={elapsed} />
